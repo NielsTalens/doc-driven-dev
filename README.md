@@ -38,7 +38,7 @@ flowchart LR
 
     B --> C{Change in docs folder?}
 
-    C -- Yes --> D[See doc changes<br/>Formulate goal, context & how to test<br/>Include product strategy, vision & user flows]
+    C -- Yes --> D[See doc changes<br/>Formulate goal, context & how to test<br/>Include context from product strategy, vision & user flows]
 
     D --> E[Create / update user story]
 
