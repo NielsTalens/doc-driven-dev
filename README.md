@@ -16,6 +16,14 @@ A project to test the following concept:
 | - Deep integration with the development workflow (PRs + docs).<br>- AI-assisted extraction of product intent from real documentation.<br>- Strong focus on product strategy and user flows, not just text summarization.<br>- Encourages healthy documentation habits without extra burden.<br>- Unique “doc-driven dev” workflow innovation. | - Time saved per story created.<br>- Documentation update frequency.<br>- Reduction in rework due to unclear requirements.<br>- Consistency score between docs, stories, and PRs.<br>- Adoption across teams (active users / repos). |
 
 # User flows
+```mermaid
+flowchart LR
+    A[Product owner receives feedback from users] --> B[Addition to existing functionality is required]
+    B --> C[PO updates product definitions and user flows]
+    C --> D[PO creates a pull request]
+    D --> E[User story is created<br/>reflecting the change in the product definition<br/>and linked to the PR]
+    E --> F[Link to the user story is included<br/>in the product definition in the main branch]
+```
 
 # Features
 
