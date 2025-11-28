@@ -6,13 +6,13 @@ To empower development teams to build exceptional, user-centric applications fas
 ## Core Strategic Pillars
 
 ### 1. Reduce Cognitive Load
-Developers spend significant mental energy on repetitive, mechanical tasks and context-switching. Our CLI tool removes this burden by automating common workflows and consolidating scattered tools into a single, intuitive interface. By reducing cognitive overhead, developers can focus their mental capacity on solving meaningful problems and creating delightful user experiences.
+Developers spend significant mental energy on repetitive, mechanical tasks and context-switching. Our tools remove this burden by automating common workflows and consolidating scattered tools into a single, intuitive interface. By reducing cognitive overhead, developers can focus their mental capacity on solving meaningful problems and creating delightful user experiences.
 
 ### 2. Accelerate Development Velocity
 Speed matters in competitive markets. Our strategy is to minimize time spent on setup, boilerplate, configuration, and debugging. Through intelligent automation and sensible defaults, we help teams ship features faster without sacrificing quality.
 
 ### 3. Improve Developer Experience (DevEx)
-Great DevEx is a competitive advantage. We obsess over every interaction point—from onboarding to daily workflows. Our CLI is designed to feel natural, provide immediate feedback, and reward expertise with power-user capabilities.
+Great DevEx is a competitive advantage. We obsess over every interaction point—from onboarding to daily workflows. Our tools are designed to feel natural, provide immediate feedback, and reward expertise with power-user capabilities.
 
 ### 4. Enable User-Centric Development
 When developers aren't buried in technical debt and tooling complexity, they can prioritize what matters most: building applications that users love. Our strategy removes obstacles to building better products.
