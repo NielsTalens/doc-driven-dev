@@ -5,7 +5,7 @@ A project to test the following concept:
 
 | **Product Vision** |
 |--------------------|
-| We remove the busywork from product development by automatically translating product definitions into aligned user stories just-in-time. This way we make sure every story reflects the product vision and user flows, allowing teams to focus on crafting exceptional products. |
+| We create room for teams to focus on exceptional product creation by ensuring that every story naturally reflects the strategy, vision and user flows. We achieve this by taking away the manual effort of connecting documentation to development and by generating meaningful, well-aligned stories. |
 
 | **Target Groups** | **Needs** | **Product** | **Business Goals** |
 |-------------------|-------------------|-------------------|-------------------|
