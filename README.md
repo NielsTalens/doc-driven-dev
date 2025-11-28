@@ -1,6 +1,5 @@
-# doc-driven-dev
-A project to test the following concept: 
-
+# Document Driven Development
+---
 # Product Vision
 
 | **Product Vision** |
@@ -34,15 +33,18 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    A[Product definition] --> B[Pull request]
+    A[Product definition] --> B[Pull request has been created]
 
     B --> C{Change in docs folder?}
 
-    C -- Yes --> D[See doc changes<br/>Formulate goal, context & how to test<br/>Include context from product strategy, vision & user flows]
+    C -- Yes --> D[See doc changes<br/>Formulate goal, context & how to test<br/>Include product definition]
 
-    D --> E[Create / update user story]
+    D --> E[User story created / updated]
 
-    E --> F[Link user story and PR]
+    E --> F[User story and PR are linked]
 
-    C -- No --> Z[No doc-driven action]
+    F --> G[User story link created in the product definition]
+
+    C -- No --> Z[No doc-driven action: TBD]
+    
 ```
