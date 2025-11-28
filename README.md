@@ -5,7 +5,7 @@ A project to test the following concept:
 
 | **Product Vision** |
 |--------------------|
-| Create an automated, documentation-driven development assistant that keeps product definition, user intent, strategy, and implementation seamlessly aligned. |
+| We remove the busywork from product development by automatically translating product definitions into aligned user stories just-in-time. This way we make sure every story reflects the product vision and user flows, allowing teams to focus on crafting exceptional products. |
 
 | **Target Groups** | **Needs** | **Product** | **Business Goals** |
 |-------------------|-------------------|-------------------|-------------------|
@@ -13,8 +13,7 @@ A project to test the following concept:
 
 | **Differentiators** | **Metrics**|
 |--------|-------------|
-| - Deep integration with the development workflow (PRs + docs).<br>- AI-assisted extraction of product intent from real documentation.<br>- Strong focus on product strategy and user flows, not just text summarization.<br>- Encourages healthy documentation habits without extra burden.<br>- Unique “doc-driven dev” workflow innovation. |
-| - Time saved per story created.<br>- Documentation update frequency.<br>- Reduction in rework due to unclear requirements.<br>- Consistency score between docs, stories, and PRs.<br>- Adoption across teams (active users / repos). |
+| - Deep integration with the development workflow (PRs + docs).<br>- AI-assisted extraction of product intent from real documentation.<br>- Strong focus on product strategy and user flows, not just text summarization.<br>- Encourages healthy documentation habits without extra burden.<br>- Unique “doc-driven dev” workflow innovation. | - Time saved per story created.<br>- Documentation update frequency.<br>- Reduction in rework due to unclear requirements.<br>- Consistency score between docs, stories, and PRs.<br>- Adoption across teams (active users / repos). |
 
 # User flows
 
