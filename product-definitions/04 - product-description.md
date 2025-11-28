@@ -42,6 +42,27 @@ The Configuration section provides centralized control over all project settings
 - Validation and error prevention
 - Exportable/shareable configuration profiles
 
+### Security
+**Purpose:** Comprehensive vulnerability detection and supply chain security management.
+
+The Security section provides an integrated set of security-focused tools designed to identify and mitigate vulnerabilities throughout your project's dependency chain. SuperCli supports language-specific security analysis tools that scan for known vulnerabilities, outdated dependencies, and potential security risks. By automating security scanning and consolidating results in one place, teams can proactively manage security posture without requiring specialized security expertise.
+
+Users can run security scans for their project by executing `security scan`. SuperCli automatically detects the languages and frameworks in use, then runs appropriate supply chain security tools tailored to each technology stack.
+
+**Key Features:**
+- Language-specific vulnerability detection
+- Supply chain security analysis
+- Automated dependency scanning
+- Consolidated security reporting
+- Actionable remediation guidance
+
+**Key Benefits:**
+- Early vulnerability detection in development
+- Reduced security debt and compliance risks
+- Standardized security practices across projects
+- Faster incident response and patching
+- Team-wide security awareness and accountability
+
 ### Documentation
 **Purpose:** Integrated access to project documentation and help resources.
 
