@@ -50,7 +50,26 @@ extract_subject() {
   echo "$basename" | sed -E 's/^[0-9]+\s*-\s*//' | sed 's/-/ /g'
 }
 
-# Read file content
+# Get the actual diff (changed lines) for a file
+get_file_diff() {
+  local filepath=$1
+
+  # Use the same SHA range as get_changed_files
+  if [[ -n "${BEFORE_SHA:-}" && -n "${AFTER_SHA:-}" && "${BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]]; then
+    git diff "$BEFORE_SHA" "$AFTER_SHA" -- "$filepath" 2>/dev/null || echo ""
+  elif git rev-parse --verify HEAD >/dev/null 2>&1 && git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+    git diff HEAD~1 HEAD -- "$filepath" 2>/dev/null || echo ""
+  else
+    # Fallback: show entire file as new content
+    if [[ -f "$filepath" ]]; then
+      echo "--- /dev/null"
+      echo "+++ $filepath"
+      cat "$filepath" | sed 's/^/+/'
+    fi
+  fi
+}
+
+# Read file content (keep for context if needed)
 get_file_content() {
   if [[ -f "$1" ]]; then
     cat "$1"
@@ -60,7 +79,7 @@ get_file_content() {
 # Call ChatGPT API
 process_with_chatgpt() {
   local filename=$1
-  local content=$2
+  local diff=$2
   local subject=$(extract_subject "$filename")
 
   echo -e "${BLUE}  → Extracting essence for: $subject${NC}" >&2
@@ -70,13 +89,15 @@ process_with_chatgpt() {
 File: $filename
 Subject: $subject
 
-Content:
-$content
+Here are the CHANGES made to this file (git diff format):
+$diff
 
-Extract the following information and return it as VALID JSON with exactly these three fields:
+Based ONLY on the lines that were added or modified (marked with + in the diff), per logical subject, extract the following information and return it as VALID JSON with exactly these three fields:
 - goal: A clear, concise goal statement (1 sentence)
 - context: Background and why this matters (2-3 sentences)
 - userFlow: A key part of the user flow related to this subject (2-3 sentences)
+
+Focus only on what was CHANGED, not the entire document.
 
 CRITICAL: Return ONLY a single JSON object. No markdown, no code blocks, no explanations. Just the raw JSON object starting with { and ending with }."
 
@@ -274,14 +295,15 @@ main() {
 
     echo -e "\n${BLUE}📄 Processing: $file${NC}"
 
-    local content=$(get_file_content "$file")
-    if [[ -z "$content" ]]; then
-      echo -e "${RED}  ✗ Could not read file${NC}"
+    # Get the diff (what changed) instead of full file
+    local diff=$(get_file_diff "$file")
+    if [[ -z "$diff" ]]; then
+      echo -e "${RED}  ✗ Could not get diff for file${NC}"
       continue
     fi
 
     # Process with ChatGPT
-    local extracted=$(process_with_chatgpt "$file" "$content")
+    local extracted=$(process_with_chatgpt "$file" "$diff")
 
     if [[ -z "$extracted" ]]; then
       echo -e "${RED}  ✗ Failed to extract content${NC}"
