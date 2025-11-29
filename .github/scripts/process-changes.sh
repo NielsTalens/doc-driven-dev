@@ -105,8 +105,18 @@ CRITICAL: Return ONLY a single JSON object. No markdown, no code blocks, no expl
   # Extract and parse the response
   local content=$(echo "$response" | jq -r '.choices[0].message.content')
 
+  # DEBUG: Output raw response
+  echo "=== RAW ChatGPT RESPONSE ===" >&2
+  echo "$content" >&2
+  echo "=== END RAW RESPONSE ===" >&2
+
   # Strip markdown code blocks if present (```json ... ```)
   content=$(echo "$content" | sed -E 's/^```json\s*//g' | sed -E 's/^```\s*//g' | sed -E 's/```\s*$//g')
+
+  # DEBUG: Output after stripping
+  echo "=== AFTER STRIPPING ===" >&2
+  echo "$content" >&2
+  echo "=== END AFTER STRIPPING ===" >&2
 
   # Validate it's proper JSON
   if echo "$content" | jq '.' >/dev/null 2>&1; then

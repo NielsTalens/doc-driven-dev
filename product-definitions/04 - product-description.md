@@ -24,7 +24,7 @@ A user can see a list of all tools by running `tools list`. They have an overvie
 Workspaces allow developers to organize and maintain separate project environments within a single CLI instance. Each workspace can have its own configuration, tools, dependencies, and documentation structure. This feature enables teams to work across multiple projects without losing context or manually configuring different environments. Workspaces can be created, modified, and navigated through an intuitive interface.
 
 Feature: overview of all available tools
-A user can see a list of all tools by running `wspc list`. They have an overview of all available workspaces. The tools are categorised per subject and sorted on alphabetic order.
+A user can see a list of all tools by running `wspc list`. They have an overview of all available workspaces. The tools are categorised per subject and sorted on alphabetic order. Sibjects are languages, IDE, security.
 
 **Key Benefits:**
 - Context isolation between projects
