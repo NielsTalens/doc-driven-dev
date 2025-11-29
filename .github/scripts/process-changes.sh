@@ -63,7 +63,7 @@ process_with_chatgpt() {
   local content=$2
   local subject=$(extract_subject "$filename")
 
-  echo -e "${BLUE}  → Extracting essence for: $subject${NC}"
+  echo -e "${BLUE}  → Extracting essence for: $subject${NC}" >&2
 
   local prompt="You are a product manager analyzing product documentation changes.
 
