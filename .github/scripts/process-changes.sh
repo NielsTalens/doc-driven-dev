@@ -288,6 +288,11 @@ main() {
       continue
     fi
 
+    # DEBUG: Show what we're parsing
+    echo "=== EXTRACTED JSON ===" >&2
+    echo "$extracted" >&2
+    echo "=== END EXTRACTED JSON ===" >&2
+
     local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
     local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
     local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
