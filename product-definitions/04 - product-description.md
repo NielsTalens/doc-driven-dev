@@ -25,6 +25,7 @@ Workspaces allow developers to organize and maintain separate project environmen
 
 Feature: overview of all available tools
 A user can see a list of all tools by running `wspc list`. They have an overview of all available workspaces. The tools are categorised per subject and sorted on alphabetic order. Sibjects are languages, IDE, security, Testing, Design, Fun.
+Feature: Create a way to update and maintain tool versions
 
 **Key Benefits:**
 - Context isolation between projects
@@ -51,6 +52,7 @@ Feature: We want a simpel way for users to be able to contribute their configura
 The Security section provides an integrated set of security-focused tools designed to identify and mitigate vulnerabilities throughout your project's dependency chain. SuperCli supports language-specific security analysis tools that scan for known vulnerabilities, outdated dependencies, and potential security risks. By automating security scanning and consolidating results in one place, teams can proactively manage security posture without requiring specialized security expertise.
 
 Feature: Users can run security scans for their project by executing `security scan`. SuperCli automatically detects the languages and frameworks in use, then runs appropriate supply chain security tools tailored to each technology stack.
+Feature: Audit all userd tools for vulnerabilities
 
 **Key Features:**
 - Language-specific vulnerability detection
@@ -72,6 +74,7 @@ Feature: Users can run security scans for their project by executing `security s
 Templates provide ready‑made blueprints for common artifacts in a documentation‑driven workflow, such as product vision, strategy, user flows, contribution guidelines, and workspace configuration. Teams can apply curated templates or define their own, ensuring new projects or sections start with a solid, standardized structure rather than from scratch.
 
 Feature: list and apply templates via `tpl list` and `tpl apply <template-name>`. Create custom templates from current files with `tpl create --from .`.
+Feature: Make it possible to add templates to the system and make the available for all users
 
 **Key Benefits:**
 - Faster onboarding with zero‑boilerplate starts
