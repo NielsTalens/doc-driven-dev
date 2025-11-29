@@ -299,11 +299,7 @@ main() {
     local subject=$(extract_subject "$file")
 
     # Create issue
-    if create_issue "$subject" "$goal" "$context" "$user_flow"; then
-      # Extract issue number and add to project
-      local last_issue=$(tail -1 /tmp/created_issues.jsonl | jq -r '.issueNumber')
-      add_to_project "$last_issue"
-    fi
+    create_issue "$subject" "$goal" "$context" "$user_flow"
   done <<< "$changed_files"
 
   local created_count=$(wc -l < /tmp/created_issues.jsonl 2>/dev/null || echo 0)

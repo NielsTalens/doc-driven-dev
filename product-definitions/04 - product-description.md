@@ -43,6 +43,8 @@ The Configuration section provides centralized control over all project settings
 - Validation and error prevention
 - Exportable/shareable configuration profiles
 
+Feature: We want a simpel way for users to be able to contribute their configurations.
+
 ### Security
 **Purpose:** Comprehensive vulnerability detection and supply chain security management.
 
@@ -68,6 +70,8 @@ Users can run security scans for their project by executing `security scan`. Sup
 **Purpose:** Integrated access to project documentation and help resources.
 
 The Documentation feature provides an organized view of all project documentation, guides, and references. Developers can browse documentation structure, search for topics, and access information without leaving the CLI. This ensures that documentation is discoverable and reduces the friction between code and its supporting materials.
+
+Feature: create a internal development wiki.
 
 **Key Benefits:**
 - Single source of truth for project knowledge
