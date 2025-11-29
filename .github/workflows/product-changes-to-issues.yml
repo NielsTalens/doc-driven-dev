@@ -1,0 +1,32 @@
+name: Product Changes to Sprint Backlog Issues
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'product-definitions/**'
+
+jobs:
+  detect-and-create-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Process changes and create issues
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: bash .github/scripts/process-changes.sh
