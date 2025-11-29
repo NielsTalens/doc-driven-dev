@@ -27,7 +27,7 @@ fi
 get_changed_files() {
   # If the workflow provided a BEFORE/AFTER SHA range (push event), use that
   if [[ -n "${BEFORE_SHA:-}" && -n "${AFTER_SHA:-}" && "${BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]]; then
-    echo "Using commit range: $BEFORE_SHA..$AFTER_SHA"
+    echo "Using commit range: $BEFORE_SHA..$AFTER_SHA" >&2
     git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" -- product-definitions/ 2>/dev/null | grep -E '\.md$' || true
     return
   fi
@@ -73,12 +73,12 @@ Subject: $subject
 Content:
 $content
 
-Extract the following information in JSON format:
-1. goal: A clear, concise goal statement (1 sentences)
-2. context: Background and why this matters (2-3 sentences)
-3. userFlow: A key part of the user flow related to this subject (2-3 sentences)
+Extract the following information and return it as VALID JSON with exactly these three fields:
+- goal: A clear, concise goal statement (1 sentence)
+- context: Background and why this matters (2-3 sentences)
+- userFlow: A key part of the user flow related to this subject (2-3 sentences)
 
-Return ONLY valid JSON, no markdown formatting."
+CRITICAL: Return ONLY a single JSON object. No markdown, no code blocks, no explanations. Just the raw JSON object starting with { and ending with }."
 
   local payload=$(jq -n \
     --arg model "gpt-3.5-turbo" \
@@ -104,7 +104,18 @@ Return ONLY valid JSON, no markdown formatting."
 
   # Extract and parse the response
   local content=$(echo "$response" | jq -r '.choices[0].message.content')
-  echo "$content" | jq '.' 2>/dev/null || echo "$content"
+
+  # Strip markdown code blocks if present (```json ... ```)
+  content=$(echo "$content" | sed -E 's/^```json\s*//g' | sed -E 's/^```\s*//g' | sed -E 's/```\s*$//g')
+
+  # Validate it's proper JSON
+  if echo "$content" | jq '.' >/dev/null 2>&1; then
+    echo "$content"
+  else
+    echo -e "${RED}  ✗ ChatGPT returned invalid JSON${NC}" >&2
+    echo "$content" >&2
+    return 1
+  fi
 }
 
 # Create GitHub issue
@@ -174,11 +185,38 @@ add_to_project() {
     return 0
   fi
 
-  local query="
+  # First, get the issue's node ID from the issue number
+  local owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)
+  local repo=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
+
+  local query="query {
+    repository(owner: \"$owner\", name: \"$repo\") {
+      issue(number: $issue_number) {
+        id
+      }
+    }
+  }"
+
+  local payload=$(jq -n --arg query "$query" '{query: $query}')
+
+  local response=$(curl -s -X POST https://api.github.com/graphql \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    -d "$payload")
+
+  local issue_node_id=$(echo "$response" | jq -r '.data.repository.issue.id // empty')
+
+  if [[ -z "$issue_node_id" ]]; then
+    echo "  ⚠ Could not get issue node ID for #$issue_number"
+    return 0
+  fi
+
+  # Now add the issue to the project using the node ID
+  query="
     mutation {
       addProjectV2ItemById(input: {
         projectId: \"$GITHUB_PROJECT_ID\"
-        contentId: \"$issue_number\"
+        contentId: \"$issue_node_id\"
       }) {
         item {
           id
@@ -187,9 +225,9 @@ add_to_project() {
     }
   "
 
-  local payload=$(jq -n --arg query "$query" '{query: $query}')
+  payload=$(jq -n --arg query "$query" '{query: $query}')
 
-  local response=$(curl -s -X POST https://api.github.com/graphql \
+  response=$(curl -s -X POST https://api.github.com/graphql \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $GITHUB_TOKEN" \
     -d "$payload")
@@ -209,7 +247,7 @@ main() {
   local changed_files=$(get_changed_files)
   local file_count=$(echo "$changed_files" | grep -c . || echo 0)
 
-  echo "Found $file_count changed file(s)"
+  echo "Found $file_count changed file(s): $changed_files"
 
   if [[ $file_count -eq 0 ]]; then
     echo "No changes detected in product-definitions"
