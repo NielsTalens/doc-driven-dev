@@ -76,30 +76,46 @@ get_file_content() {
   fi
 }
 
-# Call ChatGPT API
+# Utility: list headings in a file (for subject context)
+get_headings() {
+  local filepath=$1
+  if [[ -f "$filepath" ]]; then
+    # Output headings as bullet list (levels 2-6)
+    grep -nE '^#{2,6} ' "$filepath" | sed -E 's/^([0-9]+):\s*#+\s*/- /'
+  fi
+}
+
+# Call ChatGPT API for a single diff hunk
 process_with_chatgpt() {
   local filename=$1
   local diff=$2
-  local subject=$(extract_subject "$filename")
+  local headings=$3
+  local subject_hint=$(extract_subject "$filename")
 
-  echo -e "${BLUE}  → Extracting essence for: $subject${NC}" >&2
+  echo -e "${BLUE}  → Extracting essence for change (hint: $subject_hint)${NC}" >&2
 
   local prompt="You are a product manager analyzing product documentation changes.
 
 File: $filename
-Subject: $subject
+Subject hint (from filename): $subject_hint
 
-Here are the CHANGES made to this file (git diff format):
+Headings in file (for context):
+$headings
+
+Here is ONE change hunk for this file (unified diff):
 $diff
 
-Based ONLY on the lines that were added or modified (marked with + in the diff), per logical subject, extract the following information and return it as VALID JSON with exactly these three fields:
-- goal: A clear, concise goal statement (1 sentence)
-- context: Background and why this matters (2-3 sentences)
-- userFlow: A key part of the user flow related to this subject (2-3 sentences)
+Task:
+- Determine the most relevant subject/section based on the headings and the hunk content
+- Based ONLY on added/modified lines (those starting with '+'), extract:
+  - goal (1 sentence)
+  - context (2-3 sentences)
+  - userFlow (2-3 sentences)
 
-Focus only on what was CHANGED, not the entire document.
+Return VALID JSON with EXACTLY these fields:
+  { \"subject\": \"<best matching heading or concise subject>\", \"goal\": \"...\", \"context\": \"...\", \"userFlow\": \"...\" }
 
-CRITICAL: Return ONLY a single JSON object. No markdown, no code blocks, no explanations. Just the raw JSON object starting with { and ending with }."
+CRITICAL: Return ONLY the JSON object. No markdown, no code fences, no extra text."
 
   local payload=$(jq -n \
     --arg model "gpt-3.5-turbo" \
@@ -126,18 +142,8 @@ CRITICAL: Return ONLY a single JSON object. No markdown, no code blocks, no expl
   # Extract and parse the response
   local content=$(echo "$response" | jq -r '.choices[0].message.content')
 
-  # DEBUG: Output raw response
-  echo "=== RAW ChatGPT RESPONSE ===" >&2
-  echo "$content" >&2
-  echo "=== END RAW RESPONSE ===" >&2
-
   # Strip markdown code blocks if present (```json ... ```)
   content=$(echo "$content" | sed -E 's/^```json\s*//g' | sed -E 's/^```\s*//g' | sed -E 's/```\s*$//g')
-
-  # DEBUG: Output after stripping
-  echo "=== AFTER STRIPPING ===" >&2
-  echo "$content" >&2
-  echo "=== END AFTER STRIPPING ===" >&2
 
   # Validate it's proper JSON
   if echo "$content" | jq '.' >/dev/null 2>&1; then
@@ -302,26 +308,63 @@ main() {
       continue
     fi
 
-    # Process with ChatGPT
-    local extracted=$(process_with_chatgpt "$file" "$diff")
+    # DEBUG: Show the diff content
+    echo "=== DIFF CONTENT ===" >&2
+    echo "$diff" >&2
+    echo "=== END DIFF ===" >&2
 
-    if [[ -z "$extracted" ]]; then
-      echo -e "${RED}  ✗ Failed to extract content${NC}"
-      continue
+    # Build headings list for subject context
+    local headings=$(get_headings "$file")
+
+    # Split diff into hunks and process each hunk to create one issue per change
+    local hunks_file
+    hunks_file=$(mktemp)
+    echo "$diff" | awk 'BEGIN{first=1} /^@@ /{ if(first){ first=0 } else { print "----HUNK----" } } { print }' > "$hunks_file"
+
+    local current_hunk=""
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      if [[ "$line" == "----HUNK----" ]]; then
+        if [[ -n "$current_hunk" ]] && echo "$current_hunk" | grep -qE '^[+][^+]'; then
+          local extracted=$(process_with_chatgpt "$file" "$current_hunk" "$headings")
+          if [[ -z "$extracted" ]]; then
+            echo -e "${RED}  ✗ Failed to extract content for hunk${NC}"
+          else
+            echo "=== EXTRACTED JSON ===" >&2
+            echo "$extracted" >&2
+            echo "=== END EXTRACTED JSON ===" >&2
+            local subject_from_ai=$(echo "$extracted" | jq -r '.subject // empty')
+            local final_subject=${subject_from_ai:-$(extract_subject "$file")}
+            local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
+            local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
+            local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
+            create_issue "$final_subject" "$goal" "$context" "$user_flow"
+          fi
+        fi
+        current_hunk=""
+      else
+        current_hunk+="$line"$'\n'
+      fi
+    done < "$hunks_file"
+
+    # Process last hunk if any
+    if [[ -n "$current_hunk" ]] && echo "$current_hunk" | grep -qE '^[+][^+]'; then
+      local extracted=$(process_with_chatgpt "$file" "$current_hunk" "$headings")
+      if [[ -z "$extracted" ]]; then
+        echo -e "${RED}  ✗ Failed to extract content for hunk${NC}"
+      else
+        echo "=== EXTRACTED JSON ===" >&2
+        echo "$extracted" >&2
+        echo "=== END EXTRACTED JSON ===" >&2
+        local subject_from_ai=$(echo "$extracted" | jq -r '.subject // empty')
+        local final_subject=${subject_from_ai:-$(extract_subject "$file")}
+        local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
+        local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
+        local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
+        create_issue "$final_subject" "$goal" "$context" "$user_flow"
+      fi
     fi
 
-    # DEBUG: Show what we're parsing
-    echo "=== EXTRACTED JSON ===" >&2
-    echo "$extracted" >&2
-    echo "=== END EXTRACTED JSON ===" >&2
-
-    local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
-    local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
-    local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
-    local subject=$(extract_subject "$file")
-
-    # Create issue
-    create_issue "$subject" "$goal" "$context" "$user_flow"
+    rm -f "$hunks_file"
   done <<< "$changed_files"
 
   local created_count=$(wc -l < /tmp/created_issues.jsonl 2>/dev/null || echo 0)

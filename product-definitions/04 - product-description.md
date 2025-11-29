@@ -66,12 +66,38 @@ Feature: Users can run security scans for their project by executing `security s
 - Faster incident response and patching
 - Team-wide security awareness and accountability
 
+### Templates
+**Purpose:** Rapidly scaffold consistent docs, configs, and project assets.
+
+Templates provide ready‑made blueprints for common artifacts in a documentation‑driven workflow, such as product vision, strategy, user flows, contribution guidelines, and workspace configuration. Teams can apply curated templates or define their own, ensuring new projects or sections start with a solid, standardized structure rather than from scratch.
+
+Feature: list and apply templates via `tpl list` and `tpl apply <template-name>`. Create custom templates from current files with `tpl create --from .`.
+
+**Key Benefits:**
+- Faster onboarding with zero‑boilerplate starts
+- Consistent structure across repos and teams
+- Reusable, versioned blueprints maintained in source control
+- Reduced copy‑paste errors and drift
+
+### Integrations
+**Purpose:** Connect SuperCli to your delivery ecosystem (e.g., GitHub).
+
+Integrations streamline workflows by linking SuperCli to external services such as GitHub Issues and Projects. This enables actions like creating issues from documentation changes, syncing labels, and displaying project status without leaving the CLI. Authentication and configuration are centralized, so teams get a reliable, auditable path from docs to backlogs.
+
+Feature: manage connections with `integrations connect github`, view state with `integrations status`, and create issues from the CLI using `issues create --from file.md`.
+
+**Key Benefits:**
+- Fewer context switches; work stays in the CLI
+- Automated handoffs from docs to planning backlogs
+- Traceability from source files to issues and projects
+- Consistent permissions and configuration across workspaces
+
 ### Documentation
 **Purpose:** Integrated access to project documentation and help resources.
 
 The Documentation feature provides an organized view of all project documentation, guides, and references. Developers can browse documentation structure, search for topics, and access information without leaving the CLI. This ensures that documentation is discoverable and reduces the friction between code and its supporting materials.
 
-Feature: create a internal development wiki.
+Feature: create a internal development wiki so the information needed can be found easily.
 
 **Key Benefits:**
 - Single source of truth for project knowledge
