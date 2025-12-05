@@ -176,14 +176,15 @@ $goal
 ## Context
 $context
 
+## User Flow
+$user_flow
+
 ## Strategic Alignment
 $strategic_alignment
 
 ## Problems to Solve
-$problems_to_solve
+$problems_to_solve"
 
-## User Flow
-$user_flow"
 
   local payload=$(jq -n \
     --arg title "$subject" \
