@@ -113,13 +113,13 @@ Task:
   - goal (1 sentence): The primary objective or feature being described from the user's perspective. Describe the main purpose.
   - context (2-3 sentences): Why this matters and background. what problem does it solve. What steps are needed to solve the problems
   - userFlow: How users interact with or benefit from this. Describe the user interaction regarding this subject.
-  - strategicAlignment (1-2 sentences): Explain which strategic pillar(s) or business goal(s) this change supports and how. If no clear alignment exists, state: \"No clear strategic alignment identified.\"
-  - problemsToSolve (1-2 sentences): Explain which of the listed problems this change addresses. If no clear problems to solve are identified, state: \"No clear strategic alignment identified.\"
+  - strategicAlignment (1-2 sentences): Explain which strategic pillar(s) or business goal(s) this change supports and how. Be strict about this. If no clear alignment exists, state: \"No clear strategic alignment or business goals identified.\"
+  - problemsToSolve (1-2 sentences): Explain which of the listed problems this change addresses. Be strict about this. If no clear problems to solve are identified, state: \"No clear problems to solve identified.\"
 
 - Create a concise, meaningful subject (3-5 words) that summarizes what changed based on the goal and context. Do NOT use generic headings from the file structure; invent a specific subject that describes THIS change uniquely.
 
 Return VALID JSON with EXACTLY these fields:
-  { \"subject\": \"<specific, descriptive subject based on goal and context>\", \"goal\": \"...\", \"context\": \"...\", \"userFlow\": \"...\", \"strategicAlignment\": \"...\" }
+  { \"subject\": \"<specific, descriptive subject based on goal and context>\", \"goal\": \"...\", \"context\": \"...\", \"userFlow\": \"...\", \"strategicAlignment\": \"...\", \"problemsToSolve\": \"...\" }
 
 CRITICAL: Return ONLY the JSON object. No markdown, no code fences, no extra text."
 
@@ -168,6 +168,7 @@ create_issue() {
   local context=$3
   local user_flow=$4
   local strategic_alignment=$5
+  local problems_to_solve=$6
 
   local issue_body="## Goal
 $goal
@@ -177,6 +178,9 @@ $context
 
 ## Strategic Alignment
 $strategic_alignment
+
+## Problems to Solve
+$problems_to_solve
 
 ## User Flow
 $user_flow"
@@ -278,7 +282,8 @@ main() {
             local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
             local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
             local strategic_alignment=$(echo "$extracted" | jq -r '.strategicAlignment // "No strategic alignment information available."')
-            create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment"
+            local problems_to_solve=$(echo "$extracted" | jq -r '.problemsToSolve // "No problems to solve information available."')
+            create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment" "$problems_to_solve"
           fi
         fi
         current_hunk=""
@@ -302,7 +307,8 @@ main() {
         local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
         local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
         local strategic_alignment=$(echo "$extracted" | jq -r '.strategicAlignment // "No strategic alignment information available."')
-        create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment"
+        local problems_to_solve=$(echo "$extracted" | jq -r '.problemsToSolve // "No problems to solve information available."')
+        create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment" "$problems_to_solve"
       fi
     fi
 
