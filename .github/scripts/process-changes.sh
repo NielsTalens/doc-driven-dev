@@ -78,8 +78,28 @@ process_with_chatgpt() {
 
   echo -e "${BLUE}  → Extracting essence for change in $filename${NC}" >&2
 
-  local prompt="You are a product manager analyzing product documentation changes. You are very user experience focuseed and always think from the perspective of end users.
+  local prompt="You are a product manager analyzing product documentation changes. You are very user experience focused and always think from the perspective of end users.
 
+STRATEGIC CONTEXT:
+SuperCli's mission is to empower development teams to build exceptional, user-centric applications faster by eliminating workflow friction.
+
+Core Strategic Pillars:
+1. Reduce Cognitive Load - Automate workflows, consolidate tools, let developers focus on meaningful problems
+2. Accelerate Development Velocity - Minimize setup/boilerplate time through intelligent automation
+3. Improve Developer Experience (DevEx) - Design natural, feedback-rich interactions with power-user capabilities
+4. Enable User-Centric Development - Remove obstacles to building applications users love
+
+Business Goals:
+- Reduce time-to-productivity (4 hours for new employees, 1 hour for laptop switch)
+- Improve DevEx rating by 10%
+- Decline of workarounds by 75%
+
+Problems we are solving:
+- Availability of tools that are needed to create business value.
+- Seamless need-to-have secure connectivity.
+- Balanced user experience & risk mitigation.
+- Up-and-running on the first day.
+- Reduction of cognitive load.
 File: $filename
 
 Headings in file (for context):
@@ -93,11 +113,13 @@ Task:
   - goal (1 sentence): The primary objective or feature being described from the user's perspective. Describe the main purpose.
   - context (2-3 sentences): Why this matters and background. what problem does it solve. What steps are needed to solve the problems
   - userFlow: How users interact with or benefit from this. Describe the user interaction regarding this subject.
+  - strategicAlignment (1-2 sentences): Explain which strategic pillar(s) or business goal(s) this change supports and how. If no clear alignment exists, state: \"No clear strategic alignment identified.\"
+  - problemsToSolve (1-2 sentences): Explain which of the listed problems this change addresses. If no clear problems to solve are identified, state: \"No clear strategic alignment identified.\"
 
 - Create a concise, meaningful subject (3-5 words) that summarizes what changed based on the goal and context. Do NOT use generic headings from the file structure; invent a specific subject that describes THIS change uniquely.
 
 Return VALID JSON with EXACTLY these fields:
-  { \"subject\": \"<specific, descriptive subject based on goal and context>\", \"goal\": \"...\", \"context\": \"...\", \"userFlow\": \"...\" }
+  { \"subject\": \"<specific, descriptive subject based on goal and context>\", \"goal\": \"...\", \"context\": \"...\", \"userFlow\": \"...\", \"strategicAlignment\": \"...\" }
 
 CRITICAL: Return ONLY the JSON object. No markdown, no code fences, no extra text."
 
@@ -108,7 +130,7 @@ CRITICAL: Return ONLY the JSON object. No markdown, no code fences, no extra tex
       model: $model,
       messages: [{role: "user", content: $prompt}],
       temperature: 0.7,
-      max_tokens: 500
+      max_tokens: 600
     }')
 
   local response=$(curl -s -X POST https://api.openai.com/v1/chat/completions \
@@ -145,12 +167,16 @@ create_issue() {
   local goal=$2
   local context=$3
   local user_flow=$4
+  local strategic_alignment=$5
 
   local issue_body="## Goal
 $goal
 
 ## Context
 $context
+
+## Strategic Alignment
+$strategic_alignment
 
 ## User Flow
 $user_flow"
@@ -251,7 +277,8 @@ main() {
             local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
             local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
             local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
-            create_issue "$final_subject" "$goal" "$context" "$user_flow"
+            local strategic_alignment=$(echo "$extracted" | jq -r '.strategicAlignment // "No strategic alignment information available."')
+            create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment"
           fi
         fi
         current_hunk=""
@@ -274,7 +301,8 @@ main() {
         local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
         local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
         local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
-        create_issue "$final_subject" "$goal" "$context" "$user_flow"
+        local strategic_alignment=$(echo "$extracted" | jq -r '.strategicAlignment // "No strategic alignment information available."')
+        create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment"
       fi
     fi
 
