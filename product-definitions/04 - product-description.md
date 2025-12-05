@@ -16,6 +16,9 @@ A user can see a list of all tools by running `tools list`. They have an overvie
 Feature: See the commands per tool.
 Users should be able to see what commands are available per tool. They should be able to run `tool-name list`and the options should be shown in the screen of the cli. Common options are: install, update, configure, delete.
 
+Feature: Add new tools to SuperCli
+Users should be able to add custom tools to SuperCli by running `tools add <tool-name>`. The command will guide users through an interactive setup process where they specify the tool's name, description, available commands, and installation requirements. Once added, the tool becomes available system-wide and can be invoked like any built-in tool. Users can also contribute their custom tools to a shared registry for the community.
+
 Feature: colorise the different commands
 User should see nice colors when they use supercli
 
