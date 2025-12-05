@@ -62,7 +62,9 @@ Feature: We want a simpel way for users to be able to contribute their configura
 The Security section provides an integrated set of security-focused tools designed to identify and mitigate vulnerabilities throughout your project's dependency chain. SuperCli supports language-specific security analysis tools that scan for known vulnerabilities, outdated dependencies, and potential security risks. By automating security scanning and consolidating results in one place, teams can proactively manage security posture without requiring specialized security expertise.
 
 Feature: Users can run security scans for their project by executing `security scan`. SuperCli automatically detects the languages and frameworks in use, then runs appropriate supply chain security tools tailored to each technology stack.
-Feature: Audit all userd tools for vulnerabilities
+
+Feature: Audit all used tools for vulnerabilities.
+Now users can have many tools installed but there is a strong increase of software supply chain attacks. It would be helpfull if we can facilitate users in a quick an easy way to scan and check for vulnarabilities on their system.
 
 **Key Features:**
 - Language-specific vulnerability detection
