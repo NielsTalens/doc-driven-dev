@@ -42,14 +42,6 @@ get_changed_files() {
   git ls-files product-definitions/ | grep -E '\.md$' || true
 }
 
-# Extract subject from filename (e.g., "04 - product-description.md" -> "product description")
-extract_subject() {
-  local filename=$1
-  local basename=$(basename "$filename" .md)
-  # Remove leading numbers and hyphens, replace remaining hyphens with spaces
-  echo "$basename" | sed -E 's/^[0-9]+\s*-\s*//' | sed 's/-/ /g'
-}
-
 # Get the actual diff (changed lines) for a file
 get_file_diff() {
   local filepath=$1
@@ -90,14 +82,12 @@ process_with_chatgpt() {
   local filename=$1
   local diff=$2
   local headings=$3
-  local subject_hint=$(extract_subject "$filename")
 
-  echo -e "${BLUE}  → Extracting essence for change (hint: $subject_hint)${NC}" >&2
+  echo -e "${BLUE}  → Extracting essence for change in $filename${NC}" >&2
 
   local prompt="You are a product manager analyzing product documentation changes.
 
 File: $filename
-Subject hint (from filename): $subject_hint
 
 Headings in file (for context):
 $headings
@@ -106,14 +96,15 @@ Here is ONE change hunk for this file (unified diff):
 $diff
 
 Task:
-- Determine the most relevant subject/section based on the headings and the hunk content
 - Based ONLY on added/modified lines (those starting with '+'), extract:
-  - goal (1 sentence)
-  - context (2-3 sentences)
-  - userFlow (2-3 sentences)
+  - goal (1 sentence): The primary objective or feature being described
+  - context (2-3 sentences): Why this matters and background
+  - userFlow (2-3 sentences): How users interact with or benefit from this
+
+- Create a concise, meaningful subject (3-5 words) that summarizes what changed based on the goal and context. Do NOT use generic headings from the file structure; invent a specific subject that describes THIS change uniquely.
 
 Return VALID JSON with EXACTLY these fields:
-  { \"subject\": \"<best matching heading or concise subject>\", \"goal\": \"...\", \"context\": \"...\", \"userFlow\": \"...\" }
+  { \"subject\": \"<specific, descriptive subject based on goal and context>\", \"goal\": \"...\", \"context\": \"...\", \"userFlow\": \"...\" }
 
 CRITICAL: Return ONLY the JSON object. No markdown, no code fences, no extra text."
 
@@ -333,7 +324,7 @@ main() {
             echo "$extracted" >&2
             echo "=== END EXTRACTED JSON ===" >&2
             local subject_from_ai=$(echo "$extracted" | jq -r '.subject // empty')
-            local final_subject=${subject_from_ai:-$(extract_subject "$file")}
+            local final_subject=${subject_from_ai:-"$(basename "$file" .md)"}
             local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
             local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
             local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
@@ -356,7 +347,7 @@ main() {
         echo "$extracted" >&2
         echo "=== END EXTRACTED JSON ===" >&2
         local subject_from_ai=$(echo "$extracted" | jq -r '.subject // empty')
-        local final_subject=${subject_from_ai:-$(extract_subject "$file")}
+        local final_subject=${subject_from_ai:-"$(basename "$file" .md)"}
         local goal=$(echo "$extracted" | jq -r '.goal // "No goal extracted"')
         local context=$(echo "$extracted" | jq -r '.context // "No context extracted"')
         local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
