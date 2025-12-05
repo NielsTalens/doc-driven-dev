@@ -61,13 +61,6 @@ get_file_diff() {
   fi
 }
 
-# Read file content (keep for context if needed)
-get_file_content() {
-  if [[ -f "$1" ]]; then
-    cat "$1"
-  fi
-}
-
 # Utility: list headings in a file (for subject context)
 get_headings() {
   local filepath=$1
@@ -97,7 +90,7 @@ $diff
 
 Task:
 - Based ONLY on added/modified lines (those starting with '+'), extract:
-  - goal (1 sentence): The primary objective or feature being described from the user's perspective
+  - goal (1 sentence): The primary objective or feature being described from the user's perspective. Describe the main purpose.
   - context (2-3 sentences): Why this matters and background. what problem does it solve. What steps are needed to solve the problems
   - userFlow: How users interact with or benefit from this. Describe the user interaction regarding this subject.
 
@@ -153,20 +146,14 @@ create_issue() {
   local context=$3
   local user_flow=$4
 
-  local issue_body="## Overview
-**Subject:** $subject
-
-## Goal
+  local issue_body="## Goal
 $goal
 
 ## Context
 $context
 
 ## User Flow
-$user_flow
-
----
-*Auto-generated from product-definitions changes*"
+$user_flow"
 
   local payload=$(jq -n \
     --arg title "$subject" \
@@ -201,70 +188,6 @@ $user_flow
     local error_msg=$(echo "$response" | jq -r '.message // .error // "Unknown error"')
     echo -e "${RED}✗ Failed to create issue: $error_msg${NC}"
     return 1
-  fi
-}
-
-# Add issue to project using GraphQL
-add_to_project() {
-  local issue_number=$1
-
-  if [[ -z "${GITHUB_PROJECT_ID:-}" ]]; then
-    echo "  ⚠ GITHUB_PROJECT_ID not set, skipping project assignment"
-    return 0
-  fi
-
-  # First, get the issue's node ID from the issue number
-  local owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)
-  local repo=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
-
-  local query="query {
-    repository(owner: \"$owner\", name: \"$repo\") {
-      issue(number: $issue_number) {
-        id
-      }
-    }
-  }"
-
-  local payload=$(jq -n --arg query "$query" '{query: $query}')
-
-  local response=$(curl -s -X POST https://api.github.com/graphql \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $GITHUB_TOKEN" \
-    -d "$payload")
-
-  local issue_node_id=$(echo "$response" | jq -r '.data.repository.issue.id // empty')
-
-  if [[ -z "$issue_node_id" ]]; then
-    echo "  ⚠ Could not get issue node ID for #$issue_number"
-    return 0
-  fi
-
-  # Now add the issue to the project using the node ID
-  query="
-    mutation {
-      addProjectV2ItemById(input: {
-        projectId: \"$GITHUB_PROJECT_ID\"
-        contentId: \"$issue_node_id\"
-      }) {
-        item {
-          id
-        }
-      }
-    }
-  "
-
-  payload=$(jq -n --arg query "$query" '{query: $query}')
-
-  response=$(curl -s -X POST https://api.github.com/graphql \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $GITHUB_TOKEN" \
-    -d "$payload")
-
-  if echo "$response" | jq -e '.errors' >/dev/null 2>&1; then
-    local error_msg=$(echo "$response" | jq -r '.errors[0].message')
-    echo "  ⚠ Warning adding to project: $error_msg"
-  else
-    echo -e "${GREEN}  ✓ Added issue #$issue_number to project${NC}"
   fi
 }
 
