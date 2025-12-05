@@ -16,6 +16,9 @@ A user can see a list of all tools by running `tools list`. They have an overvie
 Feature: See the commands per tool.
 Users should be able to see what commands are available per tool. They should be able to run `tool-name list`and the options should be shown in the screen of the cli. Common options are: install, update, configure, delete.
 
+Feature: colorise the different commands
+User should see nice colors when they use supercli
+
 **Key Benefits:**
 - Quick discovery of available utilities
 - Standardized command execution
@@ -65,6 +68,9 @@ Feature: Users can run security scans for their project by executing `security s
 
 Feature: Audit all used tools for vulnerabilities.
 Now users can have many tools installed but there is a strong increase of software supply chain attacks. It would be helpfull if we can facilitate users in a quick an easy way to scan and check for vulnarabilities on their system.
+
+feature: Include a connection with GitHub Advisory Database
+Enable a connection with the GAD so user will have a realtimish input for their security scans.
 
 **Key Features:**
 - Language-specific vulnerability detection
