@@ -85,7 +85,7 @@ process_with_chatgpt() {
 
   echo -e "${BLUE}  → Extracting essence for change in $filename${NC}" >&2
 
-  local prompt="You are a product manager analyzing product documentation changes.
+  local prompt="You are a product manager analyzing product documentation changes. You are very user experience focuseed and always think from the perspective of end users.
 
 File: $filename
 
@@ -97,9 +97,9 @@ $diff
 
 Task:
 - Based ONLY on added/modified lines (those starting with '+'), extract:
-  - goal (1 sentence): The primary objective or feature being described
-  - context (2-3 sentences): Why this matters and background
-  - userFlow (2-3 sentences): How users interact with or benefit from this
+  - goal (1 sentence): The primary objective or feature being described from the user's perspective
+  - context (2-3 sentences): Why this matters and background. what problem does it solve. What steps are needed to solve the problems
+  - userFlow: How users interact with or benefit from this. Describe the user interaction regarding this subject.
 
 - Create a concise, meaningful subject (3-5 words) that summarizes what changed based on the goal and context. Do NOT use generic headings from the file structure; invent a specific subject that describes THIS change uniquely.
 
@@ -169,7 +169,7 @@ $user_flow
 *Auto-generated from product-definitions changes*"
 
   local payload=$(jq -n \
-    --arg title "[Product Update] $subject" \
+    --arg title "$subject" \
     --arg body "$issue_body" \
     '{
       title: $title,

@@ -10,7 +10,11 @@ SuperCli provides a unified interface for managing documentation-driven developm
 
 The Tools section provides a curated collection of command-line utilities designed to accelerate your development workflow. This includes code generators, build scripts, linters, formatters, and other automation tools configured for your project. Rather than memorizing commands or searching through documentation, developers can discover and execute tools directly from the home screen, improving productivity and reducing context switching.
 
+Feature: see an overview of all available tools
 A user can see a list of all tools by running `tools list`. They have an overview of all available tools.
+
+Feature: See the commands per tool.
+Users should be able to see what commands are available per tool. They should be able to run `tool-name list`and the options should be shown in the screen of the cli. Common options are: install, update, configure, delete.
 
 **Key Benefits:**
 - Quick discovery of available utilities
@@ -25,11 +29,14 @@ Workspaces allow developers to organize and maintain separate project environmen
 
 Feature: overview of all available workspaces
 A user can see a list of all workspaces by running `wspc list`. They have an overview of all available workspaces. The tools are categorised per subject and sorted on alphabetic order. Sibjects are languages, IDE, security, Testing, Design, Fun.
+
 Feature: Create a way to update and maintain tool versions
 
 Feature: workspace settings
 A user can see all workspace settings by running `workspace-name settings list`.
 
+Feature: Add a team profile with all their workspaces
+Within any company people have conversations about technical challenges they face. Often someone will mention that a certain team or person already solved that particular challenge. If one knows in what workspace that issue is solved it is easier to find.
 **Key Benefits:**
 - Context isolation between projects
 - Quick workspace switching
