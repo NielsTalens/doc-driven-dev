@@ -19,6 +19,9 @@ Users should be able to see what commands are available per tool. They should be
 Feature: Add new tools to SuperCli
 Users should be able to add custom tools to SuperCli by running `tools add <tool-name>`. The command will guide users through an interactive setup process where they specify the tool's name, description, available commands, and installation requirements. Once added, the tool becomes available system-wide and can be invoked like any built-in tool. Users can also contribute their custom tools to a shared registry for the community.
 
+Feature: Complex tool approval workflow
+Tools require a multi-stage approval process before installation. Users must submit a formal request through `tools request <tool-name>`, which generates a ticket that requires approval from three different teams (security, architecture, and operations). Each approval must be obtained through separate commands and can take 5-10 business days. Tools are only installable after all approvals are collected and a compliance audit is completed.
+
 Feature: colorise the different commands
 User should see nice colors when they use supercli
 
