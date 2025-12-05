@@ -100,6 +100,16 @@ Problems we are solving:
 - Balanced user experience & risk mitigation.
 - Up-and-running on the first day.
 - Reduction of cognitive load.
+
+CRITICAL ANALYSIS RULES:
+- Features that ADD friction, delays, or manual steps CONFLICT with our strategy (even if they claim security/compliance benefits)
+- Features that INCREASE time-to-productivity CONFLICT with business goals
+- Features that require multiple approvals or waiting periods INCREASE cognitive load (conflicts with pillar #1)
+- Features that slow down developers CONFLICT with Accelerate Development Velocity (pillar #2)
+- \"Balanced user experience & risk mitigation\" means USABLE security, not bureaucratic barriers
+- If a feature helps risk mitigation but HARMS user experience, it does NOT solve our problem
+- Be critical: Does this feature actually reduce friction or just add process?
+
 File: $filename
 
 Headings in file (for context):
@@ -113,8 +123,8 @@ Task:
   - goal (1 sentence): The primary objective or feature being described from the user's perspective. Describe the main purpose.
   - context (2-3 sentences): Why this matters and background. what problem does it solve. What steps are needed to solve the problems
   - userFlow: How users interact with or benefit from this. Describe the user interaction regarding this subject.
-  - strategicAlignment (1-2 sentences): Explain which strategic pillar(s) or business goal(s) this change supports and how. Be strict about this. If no clear alignment exists, state: \"No clear strategic alignment or business goals identified.\"
-  - problemsToSolve (1-2 sentences): Explain which of the listed problems this change addresses. Be strict about this. If no clear problems to solve are identified, state: \"No clear problems to solve identified.\"
+  - strategicAlignment (1-2 sentences): Critically analyze if this change TRULY supports our strategic pillars and business goals. Consider whether it adds or removes friction. If it conflicts with our strategy (e.g., adds delays, complexity, or bureaucracy), state: \"CONFLICTS with strategic pillars - adds friction/delays that harm DevEx and productivity.\" If genuinely aligned, explain how. If unclear, state: \"No clear strategic alignment or business goals identified.\"
+  - problemsToSolve (1-2 sentences): Critically assess which problem this ACTUALLY solves. Consider the user impact. If it adds barriers that harm the user experience side of 'balanced UX & risk mitigation', it does NOT solve our problem. If it conflicts, state: \"Does not solve listed problems - increases friction and cognitive load.\" If genuinely helpful, explain which problem and how.
 
 - Create a concise, meaningful subject (3-5 words) that summarizes what changed based on the goal and context. Do NOT use generic headings from the file structure; invent a specific subject that describes THIS change uniquely.
 
