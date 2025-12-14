@@ -171,6 +171,71 @@ CRITICAL: Return ONLY the JSON object. No markdown, no code fences, no extra tex
   fi
 }
 
+# Determine alignment label from strategic alignment text
+get_alignment_label() {
+  local strategic_alignment=$1
+
+  # Check for conflict indicators
+  if echo "$strategic_alignment" | grep -qiE "(CONFLICT|conflicts with|does not align|contradicts|opposes)"; then
+    echo "strategy: conflicts"
+    return 0
+  fi
+
+  # Check for unclear/no alignment
+  if echo "$strategic_alignment" | grep -qiE "(No clear strategic alignment|unclear|cannot determine|not identified)"; then
+    echo "strategy: unclear"
+    return 0
+  fi
+
+  # Check for partial alignment
+  if echo "$strategic_alignment" | grep -qiE "(partial|mixed|some alignment|partially)"; then
+    echo "strategy: partial"
+    return 0
+  fi
+
+  # Check for positive alignment indicators
+  if echo "$strategic_alignment" | grep -qiE "(supports|aligns with|contributes to|enables|accelerates|reduces)"; then
+    echo "strategy: aligned"
+    return 0
+  fi
+
+  # Default to unclear if we can't determine
+  echo "strategy: unclear"
+}
+
+# Add alignment label to issue
+add_alignment_label() {
+  local issue_number=$1
+  local label=$2
+
+  if [[ -z "$label" ]]; then
+    echo -e "${YELLOW}⚠ No label to add${NC}" >&2
+    return 0
+  fi
+
+  local payload=$(jq -n \
+    --arg label "$label" \
+    '{
+      labels: [$label]
+    }')
+
+  local response=$(curl -s -X POST \
+    "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${issue_number}/labels" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -d "$payload")
+
+  if echo "$response" | jq -e '.[0].id' >/dev/null 2>&1; then
+    echo -e "${GREEN}  ✓ Added label '${label}' to issue #${issue_number}${NC}"
+    return 0
+  else
+    local error_msg=$(echo "$response" | jq -r '.message // .error // "Unknown error"')
+    echo -e "${RED}  ✗ Failed to add label: $error_msg${NC}" >&2
+    return 1
+  fi
+}
+
 # Create GitHub issue
 create_issue() {
   local subject=$1
@@ -224,6 +289,8 @@ $problems_to_solve"
     # Save issue info for project assignment
     echo "{\"issueNumber\": $issue_number, \"issueUrl\": \"$issue_url\"}" >> /tmp/created_issues.jsonl
 
+    # Return issue number for labeling
+    echo "$issue_number"
     return 0
   else
     local error_msg=$(echo "$response" | jq -r '.message // .error // "Unknown error"')
@@ -294,7 +361,11 @@ main() {
             local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
             local strategic_alignment=$(echo "$extracted" | jq -r '.strategicAlignment // "No strategic alignment information available."')
             local problems_to_solve=$(echo "$extracted" | jq -r '.problemsToSolve // "No problems to solve information available."')
-            create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment" "$problems_to_solve"
+            local issue_number=$(create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment" "$problems_to_solve")
+            if [[ -n "$issue_number" ]]; then
+              local alignment_label=$(get_alignment_label "$strategic_alignment")
+              add_alignment_label "$issue_number" "$alignment_label"
+            fi
           fi
         fi
         current_hunk=""
@@ -319,7 +390,11 @@ main() {
         local user_flow=$(echo "$extracted" | jq -r '.userFlow // "No user flow extracted"')
         local strategic_alignment=$(echo "$extracted" | jq -r '.strategicAlignment // "No strategic alignment information available."')
         local problems_to_solve=$(echo "$extracted" | jq -r '.problemsToSolve // "No problems to solve information available."')
-        create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment" "$problems_to_solve"
+        local issue_number=$(create_issue "$final_subject" "$goal" "$context" "$user_flow" "$strategic_alignment" "$problems_to_solve")
+        if [[ -n "$issue_number" ]]; then
+          local alignment_label=$(get_alignment_label "$strategic_alignment")
+          add_alignment_label "$issue_number" "$alignment_label"
+        fi
       fi
     fi
 
