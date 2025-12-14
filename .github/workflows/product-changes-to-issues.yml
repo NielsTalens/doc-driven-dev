@@ -23,8 +23,8 @@ jobs:
 
       - name: Process changes and create issues
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_PROJECT_ID: ${{ secrets.PROJECT_ID }}
           BEFORE_SHA: ${{ github.event.before }}
