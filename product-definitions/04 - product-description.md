@@ -25,6 +25,9 @@ Tools require a multi-stage approval process before installation. Users must sub
 Feature: colorise the different commands
 User should see nice colors when they use supercli
 
+Feature: Quick command search
+Users can instantly find and run commands with `supercli search <keyword>` to filter all available tools and actions.
+
 Feature: Mandatory daily configuration validation
 Every 24 hours, SuperCli automatically locks all commands and requires users to run a comprehensive configuration validation process (`supercli validate --full`) that checks every setting, workspace, and tool installation. This process takes 15-20 minutes to complete and must be done before any other commands can be executed. Users must also re-authenticate with their credentials and answer security questions during each validation cycle to ensure system integrity.
 
