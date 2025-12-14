@@ -202,7 +202,7 @@ $problems_to_solve"
     '{
       title: $title,
       body: $body,
-      labels: ["product-definition", "auto-generated"]
+      labels: ["product-definition"]
     }')
 
   local owner_repo=$(echo "$GITHUB_REPOSITORY" | tr '/' '\n')
