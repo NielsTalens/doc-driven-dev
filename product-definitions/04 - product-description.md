@@ -74,6 +74,8 @@ Users can personalize their SuperCli home screen and menu layout by running `sup
 Feature: Custom color schemes
 Users can add and apply custom color schemes to personalize their CLI experience by running `supercli theme add <theme-name>`. They can define colors for different elements like commands, output, warnings, and errors. Built-in themes are available, and users can create their own or import community-shared themes via `supercli theme import <url>`. Switch between themes instantly with `supercli theme apply <theme-name>`.
 
+Feature: remove tools that are now longer the standard within the company
+
 ### Security
 **Purpose:** Comprehensive vulnerability detection and supply chain security management.
 
