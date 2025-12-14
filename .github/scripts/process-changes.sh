@@ -219,6 +219,8 @@ add_alignment_label() {
       labels: [$label]
     }')
 
+  echo -e "${BLUE}  → Adding label '${label}' to issue #${issue_number}${NC}" >&2
+
   local response=$(curl -s -X POST \
     "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${issue_number}/labels" \
     -H "Content-Type: application/json" \
@@ -226,13 +228,19 @@ add_alignment_label() {
     -H "Accept: application/vnd.github.v3+json" \
     -d "$payload")
 
+  # Debug output
+  echo "=== LABEL RESPONSE ===" >&2
+  echo "$response" >&2
+  echo "=== END LABEL RESPONSE ===" >&2
+
   if echo "$response" | jq -e '.[0].id' >/dev/null 2>&1; then
     echo -e "${GREEN}  ✓ Added label '${label}' to issue #${issue_number}${NC}"
     return 0
   else
     local error_msg=$(echo "$response" | jq -r '.message // .error // "Unknown error"')
     echo -e "${RED}  ✗ Failed to add label: $error_msg${NC}" >&2
-    return 1
+    echo -e "${YELLOW}  ⚠ Continuing without label...${NC}" >&2
+    return 0  # Don't fail the whole workflow just for labeling
   fi
 }
 
