@@ -81,6 +81,9 @@ Now users can have many tools installed but there is a strong increase of softwa
 feature: Include a connection with GitHub Advisory Database
 Enable a connection with the GAD so user will have a realtimish input for their security scans.
 
+Feature: provide how-to information to keep env secure
+We want user to have all information about how to make theur workplace secure written down in supercli. This way they do not have to search for it on a website or any other place.
+
 **Key Features:**
 - Language-specific vulnerability detection
 - Supply chain security analysis
