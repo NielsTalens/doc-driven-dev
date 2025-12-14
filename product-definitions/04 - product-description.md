@@ -68,6 +68,9 @@ The Configuration section provides centralized control over all project settings
 
 Feature: We want a simpel way for users to be able to contribute their configurations. They should be able to commit them.
 
+Feature: Customizable menu structure
+Users can personalize their SuperCli home screen and menu layout by running `supercli menu customize`. They can reorder sections, hide features they don't use, add shortcuts to frequently-used commands, and save multiple menu profiles for different workflows. This allows each developer to organize their CLI interface in the way that best fits their personal working style.
+
 ### Security
 **Purpose:** Comprehensive vulnerability detection and supply chain security management.
 
