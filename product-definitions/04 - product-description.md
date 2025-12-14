@@ -71,6 +71,9 @@ Feature: We want a simpel way for users to be able to contribute their configura
 Feature: Customizable menu structure
 Users can personalize their SuperCli home screen and menu layout by running `supercli menu customize`. They can reorder sections, hide features they don't use, add shortcuts to frequently-used commands, and save multiple menu profiles for different workflows. This allows each developer to organize their CLI interface in the way that best fits their personal working style.
 
+Feature: Custom color schemes
+Users can add and apply custom color schemes to personalize their CLI experience by running `supercli theme add <theme-name>`. They can define colors for different elements like commands, output, warnings, and errors. Built-in themes are available, and users can create their own or import community-shared themes via `supercli theme import <url>`. Switch between themes instantly with `supercli theme apply <theme-name>`.
+
 ### Security
 **Purpose:** Comprehensive vulnerability detection and supply chain security management.
 
