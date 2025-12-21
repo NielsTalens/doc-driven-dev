@@ -237,44 +237,29 @@ $recommendation
 
   local title="$subject"
 
-  local payload=$(jq -n \
-    --arg title "$title" \
-    --arg head "$BRANCH_NAME" \
-    --arg base "main" \
-    --arg body "$pr_body" \
-    '{
-      title: $title,
-      head: $head,
-      base: $base,
-      body: $body,
-      maintainer_can_modify: true
-    }')
+  # Use GitHub CLI to create PR (works with GITHUB_TOKEN)
+  echo -e "${BLUE}Creating PR with gh CLI...${NC}" >&2
+  
+  local pr_url=$(echo "$pr_body" | gh pr create \
+    --title "$title" \
+    --body-file - \
+    --base main \
+    --head "$BRANCH_NAME" \
+    --label "$label" 2>&1)
 
-  local response=$(curl -s -X POST \
-    "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $GITHUB_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    -d "$payload")
-
-  if echo "$response" | jq -e '.id' >/dev/null 2>&1; then
-    local pr_number=$(echo "$response" | jq -r '.number')
-    local pr_url=$(echo "$response" | jq -r '.html_url')
+  if [[ $? -eq 0 ]]; then
+    # Extract PR number from URL
+    local pr_number=$(echo "$pr_url" | grep -oE '[0-9]+$')
     echo -e "${GREEN}✓ Created PR #$pr_number: $title${NC}"
     echo -e "${BLUE}  URL: $pr_url${NC}"
-
-    # Add label to PR
-    add_label "$pr_number" "$label"
-
     return 0
   else
-    local error_msg=$(echo "$response" | jq -r '.message // .error // "Unknown error"')
-    echo -e "${RED}✗ Failed to create PR: $error_msg${NC}"
+    echo -e "${RED}✗ Failed to create PR: $pr_url${NC}"
     return 1
   fi
 }
 
-# Add label to PR
+# Add label to PR (no longer needed, gh pr create handles it)
 add_label() {
   local pr_number=$1
   local label=$2
