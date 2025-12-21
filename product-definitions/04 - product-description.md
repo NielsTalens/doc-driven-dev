@@ -33,7 +33,10 @@ Every 24 hours, SuperCli automatically locks all commands and requires users to 
 
 
 feature: add favorite local folders to home screen
-This will make sure engineers can quickly jump to the most used folders without having to either cd to it or leave the cli to do it with Finder/Explorer. 
+This will make sure engineers can quickly jump to the most used folders without having to either cd to it or leave the cli to do it with Finder/Explorer.
+
+Feature: Command history with smart suggestions
+SuperCli remembers frequently used commands and suggests them based on context with `supercli history`.
 
 **Key Benefits:**
 - Quick discovery of available utilities
