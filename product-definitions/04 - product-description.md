@@ -31,6 +31,10 @@ Users can instantly find and run commands with `supercli search <keyword>` to fi
 Feature: Mandatory daily configuration validation
 Every 24 hours, SuperCli automatically locks all commands and requires users to run a comprehensive configuration validation process (`supercli validate --full`) that checks every setting, workspace, and tool installation. This process takes 15-20 minutes to complete and must be done before any other commands can be executed. Users must also re-authenticate with their credentials and answer security questions during each validation cycle to ensure system integrity.
 
+
+feature: add favorite local folders to home screen
+This will make sure engineers can quickly jump to the most used folders without having to either cd to it or leave the cli to do it with Finder/Explorer. 
+
 **Key Benefits:**
 - Quick discovery of available utilities
 - Standardized command execution
