@@ -1,9 +1,9 @@
-name: Auto-Create PR from pull-request-setup
+name: Auto-Create PR from pull-request-based
 
 on:
   push:
     branches:
-      - pull-request-setup
+      - pull-request-based
 
 permissions:
   contents: read
