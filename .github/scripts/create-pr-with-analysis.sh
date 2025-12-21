@@ -239,30 +239,40 @@ $recommendation
 
   # Use GitHub CLI to create PR (works with GITHUB_TOKEN)
   echo -e "${BLUE}Creating PR with gh CLI...${NC}" >&2
-  
-  local pr_url=$(echo "$pr_body" | gh pr create \
+
+  local pr_output=$(echo "$pr_body" | gh pr create \
     --title "$title" \
     --body-file - \
     --base main \
-    --head "$BRANCH_NAME" \
-    --label "$label" 2>&1)
+    --head "$BRANCH_NAME" 2>&1)
 
-  if [[ $? -eq 0 ]]; then
+  if [[ $? -eq 0 && "$pr_output" =~ https:// ]]; then
     # Extract PR number from URL
-    local pr_number=$(echo "$pr_url" | grep -oE '[0-9]+$')
+    local pr_number=$(echo "$pr_output" | grep -oE '[0-9]+$')
     echo -e "${GREEN}✓ Created PR #$pr_number: $title${NC}"
-    echo -e "${BLUE}  URL: $pr_url${NC}"
+    echo -e "${BLUE}  URL: $pr_output${NC}"
+
+    # Add label separately
+    add_label "$pr_number" "$label"
+
     return 0
   else
-    echo -e "${RED}✗ Failed to create PR: $pr_url${NC}"
+    echo -e "${RED}✗ Failed to create PR: $pr_output${NC}"
     return 1
   fi
 }
 
-# Add label to PR (no longer needed, gh pr create handles it)
+# Add label to PR
 add_label() {
   local pr_number=$1
   local label=$2
+
+  if [[ -z "$label" || -z "$pr_number" ]]; then
+    return 0
+  fi
+
+  # Use gh to add label
+  gh pr edit "$pr_number" --add-label "$label" 2>/dev/null || echo -e "${YELLOW}  ⚠ Could not add label '$label'${NC}" >&2
 
   local payload=$(jq -n \
     --arg label "$label" \
